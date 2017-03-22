@@ -4,36 +4,48 @@ public class AccountTest {
 	
 	public static void main(String[] args){
 		
-		// get input
 		Scanner input = new Scanner(System.in);
+		// get input
+		/*
 		System.out.printf("account1 balance : ");
 		double m1 = input.nextDouble();
 		System.out.printf("account2 balance : ");
+		System.out.println();
 		double m2 = input.nextDouble();
-		
+		*/
 		
 		// make two accounts
-		Bank myBank1 = new Bank("account1", m1);		
-		Bank myBank2 = new Bank("account2", m2);
+		CheckingBankAccount myBank1 = new CheckingBankAccount("account1", 100);		
+		CheckingBankAccount myBank2 = new CheckingBankAccount("account2", 100);
 		
 		
 		// use 1
-		System.out.printf("\nEnter withdrawal amount for account1 : ");
-		double m11 = input.nextDouble();
-		
-		myBank1.debit(m11);
 		myBank1.balance();
 		myBank2.balance();
+		System.out.printf("\nEnter deposit amount for Account1 : ");
+		double m11 = input.nextDouble();
+		
+		myBank1.credit(m11);
+
 		
 		// use 2
-		System.out.printf("\nEnter withdrawal amount for account2 : ");
+		myBank1.balance();
+		myBank2.balance();
+		System.out.printf("\nEnter withdrawal amount for Account2 : ");
 		double m22 = input.nextDouble();
 		
 		myBank2.debit(m22);
-		myBank1.balance();
-		myBank2.balance();
+
 		
 		// print
+		
+		myBank1.balance();
+		myBank2.balance();
+		System.out.println("\nnext month!");
+		myBank1.nextMonth();
+		myBank2.nextMonth();
+		myBank1.balance();
+		myBank2.balance();
 	}
 
 }

@@ -2,8 +2,8 @@ package silsub2;
 
 public class Bank {
 	
-	private double money;
-	public final String name;
+	protected double money;
+	public String name;
 	
 	
 	public void credit(double add){
@@ -24,6 +24,9 @@ public class Bank {
 			System.out.printf("substracting $%f from %s balance\n", sub, name);
 		}
 		
+	}
+	protected void setBalance(double a){
+		money = a;
 	}
 	
 	public Bank(String name, double money){
