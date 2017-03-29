@@ -22,10 +22,15 @@ public class AccountTest {
 		((CheckingAccount) account1).passTime(1);
 		System.out.printf("Account1 balance : $ %.2f\t 현재 출금 가능 금액 : %.2f\n", account1.getBalance(), account1.getWithdrawableAccount());
 		// check bankrupt
+		if(((CheckingAccount) account1).isBankrupted()){
+			System.out.println("account1 went Bankrupt!");
+		}
 		((CheckingAccount) account1).passTime(5);
 		System.out.printf("Account1 balance : $ %.2f\t 현재 출금 가능 금액 : %.2f\n", account1.getBalance(), account1.getWithdrawableAccount());
 		// check bankrupt
-		
+		if(((CheckingAccount) account1).isBankrupted()){
+			System.out.println("account1 went Bankrupt!");
+		}
 		
 		
 		// SavingAccount
