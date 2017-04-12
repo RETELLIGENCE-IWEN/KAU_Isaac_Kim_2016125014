@@ -1,4 +1,4 @@
-package silsub3;
+package s_04_12;
 
 public class ChkAccount implements Valuable {
 	
@@ -15,6 +15,10 @@ public class ChkAccount implements Valuable {
 		this.loa_interest = lLinter;
 	}
 	
+	
+	public double getBalance(){
+		return balance;
+	}
 	// 출금가능 금액
 	public double getWithdraw(){
 		if (balance+loan_limit<0){
@@ -26,12 +30,16 @@ public class ChkAccount implements Valuable {
 	}
 	
 	// 출금
+	// 출금
 	public void debit(double out)
 	throws Exception{
+		if (out <0) throw new Exception("으음수 입려억");
 		if(getWithdraw() > out){
 			balance = (balance-out);			
 		}
+		else throw new Exception("한도초과^^ ㄲㅈ삼");
 	}
+	
 	
 	// 시간이 끊임없이 흐르지 tic-toc
 	public void passTime(int t){
