@@ -1,4 +1,4 @@
-// Licencce
+// License
 package gts;
 
 import java.util.*;
