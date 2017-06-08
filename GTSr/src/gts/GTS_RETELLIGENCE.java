@@ -2,6 +2,7 @@
 package gts;
 
 import java.util.*;
+import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -157,7 +158,7 @@ public class GTS_RETELLIGENCE extends JComponent{
 	
 	
 	
-	public static void main(String[] args){
+	public static void main(String[] args) throws IOException{
 
 
 		//System.out.print((NodeTable(1).getPositionID()));
@@ -357,11 +358,22 @@ public class GTS_RETELLIGENCE extends JComponent{
 	        }
 	    });
 	    
+	    
+	    // C:\Users\iwins\Presets
 	    // Preset 1
 	    T1Button.addActionListener(new ActionListener() {
 	        @Override
 	        public void actionPerformed(ActionEvent e) {
-	
+	            byte[] b = new byte[1024];
+	            try{
+		            FileInputStream input = new FileInputStream("C:/Users/iwins/Presets/p1/Nodes");
+		            input.read(b);
+		            System.out.println(new String(b));
+		            input.close();
+	            }
+	            catch (Exception e1) {
+	            	System.out.print("¤Ð¤Ì");
+	            }
 	        }
 	    });
 	    
