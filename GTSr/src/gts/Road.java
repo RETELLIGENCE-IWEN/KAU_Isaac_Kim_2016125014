@@ -3,12 +3,15 @@ package gts;
 public class Road extends Node{
 	
 	private Vehicle[] lane;
-	public Road[] connection;
+	public Node LinkOut;
 	private int length;
 	private double Congestion;
+	private int Usage_t[];
 	
-	
-	
+	public Road(int len, Node start, Node end){
+		
+	}
+
 	public int enter(Vehicle newbe){
 		// put new Vehicle object into appropriate lane 
 		if(lane_is_full() == 1){// if successful
@@ -34,10 +37,4 @@ public class Road extends Node{
 	public void set(){
 		// open road
 	}
-		
-	
-	public Road(int length, Node start, Node end){
-		
-	}
-
 }

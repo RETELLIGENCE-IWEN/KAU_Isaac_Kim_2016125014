@@ -14,10 +14,12 @@ public class GTS_RETELLIGENCE extends JComponent{
 	static Scanner scan = new Scanner(System.in);	
 	public static boolean isINIT = false;
 	public static int NodeCount = 0;
+	public static int RoadCount = 0;
 	public static int X_limit = 13;
-	public static int Y_limit = 13;
+	public static int Y_limit = 12;
 	
 	public static Node[] NodeTable = new Node[(X_limit*Y_limit)];
+	public static Node[] RoadTable = new Node[(X_limit*Y_limit*16)];
 	
 	private static class Line{
 	    final int x1; 
@@ -47,8 +49,8 @@ public class GTS_RETELLIGENCE extends JComponent{
 	}
 
 	public void clearLines() {
-	    //lines.clear();
-	    //repaint();
+	    lines.clear();
+	    repaint();
 	}
 	
 	@Override
@@ -79,6 +81,9 @@ public class GTS_RETELLIGENCE extends JComponent{
 				System.out.print("\nWrong type for new Node");
 			}
 		}
+		else{
+			// no more space
+		}
 	}
 	
 	@SuppressWarnings("unused")
@@ -96,6 +101,12 @@ public class GTS_RETELLIGENCE extends JComponent{
 			}
 			NodeCount -= 1;
 		}
+	}
+	
+	static void NodeClear() {
+		NodeCount = 0;
+		NodeTable = new Node[(X_limit*Y_limit)];
+		
 	}
 	
 	public static Node getNode(int id){
@@ -142,14 +153,16 @@ public class GTS_RETELLIGENCE extends JComponent{
 	}
 	
 	static void print(){
-		System.out.print("\nprint");
+		//System.out.print("\nprint");
 		for(int i = 0; i<NodeTable.length; i++){
 			if(NodeTable[i]!=null){
-				System.out.printf("\nNode %d : %d, %d    Type : %s   Polulation : %d", i, 
+				System.out.printf("\nNode %d : %d, %d    Type : %s   Polulation : %d", i/2, 
 						(NodeTable[i].getPositionID())/100, (NodeTable[i].getPositionID())%100, 
 						NodeTable[i].getType(), NodeTable[i].getPopulation());
 			}
 		}
+		System.out.print("\n\n");
+		
 	}
 	
 
@@ -173,16 +186,10 @@ public class GTS_RETELLIGENCE extends JComponent{
 		// GUI Frame
 	    JFrame testFrame = new JFrame("Ground Transportation Simulation - RETELLIGENCE");
 	    testFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-	    final GTS_RETELLIGENCE comp = new GTS_RETELLIGENCE();
-	    comp.setPreferredSize(new Dimension(700, 800));
-	    testFrame.getContentPane().add(comp, BorderLayout.CENTER);
-	   
-	    // INTERFACE Frame
-	    JFrame testFrame2 = new JFrame("Ground Transportation Simulation - RETELLIGENCE");
-	    testFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	    final GTS_RETELLIGENCE comp1 = new GTS_RETELLIGENCE();
 	    comp1.setPreferredSize(new Dimension(700, 800));
 	    testFrame.getContentPane().add(comp1, BorderLayout.CENTER);
+
 
 
 
@@ -206,32 +213,47 @@ public class GTS_RETELLIGENCE extends JComponent{
 	    buttonsPanel.add(newNodeButton);
 	    buttonsPanel.add(newLineButton);
 	    buttonsPanel.add(RUNButton);
+	    buttonsPanel.add(clearButton);
 	    //buttonsPanel.add(clearButton);
-	    testFrame2.getContentPane().add(buttonsPanel2, BorderLayout.SOUTH);
+	    //testFrame2.getContentPane().add(buttonsPanel2, BorderLayout.SOUTH);
 	    testFrame.getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
 	    testFrame.getContentPane().add(inputPanel, BorderLayout.NORTH);
 	    
+	    
+	    
+	    Console console = new Console();
+	    console.init();
+    	
+	    		
 	    // Initialize
-    	if(isINIT == false){
-        	// Initializing
-            int xline = 13, yline = 12;
-            int startX = 50, startY=50;
-            
-            // Draw Horizontal lines
-            int x1 = startX, y1 = startY;
-            for (int i=0; i<=(xline); i++){
-            	comp1.addLine(x1, y1, x1+(50*yline), y1, Color.LIGHT_GRAY);
-            	y1 += (50);
-            }
-            // Draw vertical lines
-            x1 = startX;
-            y1 = startY;
-            for (int i=0; i<=(yline); i++){
-            	comp1.addLine(x1, y1, x1, y1+(50*xline), Color.LIGHT_GRAY);
-            	x1 += (50);
-            }
-            isINIT = true;
-    	}
+	    initializeButton.addActionListener(new ActionListener() {
+	    	// Initializing grid
+	        @Override
+	        public void actionPerformed(ActionEvent e) {
+	        	if(isINIT == false){
+		            int xline = 13, yline = 12;
+		            int startX = 50, startY=50;
+		            
+		            // Draw Horizontal lines
+		            int x1 = startX, y1 = startY;
+		            for (int i=0; i<=(xline); i++){
+		            	comp1.addLine(x1, y1, x1+(50*yline), y1, Color.LIGHT_GRAY);
+		            	y1 += (50);
+		            }
+		            // Draw vertical lines
+		            x1 = startX;
+		            y1 = startY;
+		            for (int i=0; i<=(yline); i++){
+		            	comp1.addLine(x1, y1, x1, y1+(50*xline), Color.LIGHT_GRAY);
+		            	x1 += (50);
+		            }
+		            isINIT = true;
+
+	        	}
+	        }
+	    });
+	    initializeButton.doClick();
+
     	
 	    // New Road
 	    newLineButton.addActionListener(new ActionListener() {
@@ -261,6 +283,7 @@ public class GTS_RETELLIGENCE extends JComponent{
 	        @Override
 	        public void actionPerformed(ActionEvent e) {
 	            comp1.clearLines();
+	            isINIT = false;
 	        }
 	    });
 	    
@@ -320,34 +343,7 @@ public class GTS_RETELLIGENCE extends JComponent{
 			}
 	    });
 	    
-	    // Initialize
-	    initializeButton.addActionListener(new ActionListener() {
-	    	// Initializing grid
-	        @Override
-	        public void actionPerformed(ActionEvent e) {
-	        	if(isINIT == false){
-		            int xline = 13, yline = 12;
-		            int startX = 50, startY=50;
-		            
-		            // Draw Horizontal lines
-		            int x1 = startX, y1 = startY;
-		            for (int i=0; i<=(xline); i++){
-		            	comp1.addLine(x1, y1, x1+(50*yline), y1, Color.LIGHT_GRAY);
-		            	y1 += (50);
-		            }
-		            // Draw vertical lines
-		            x1 = startX;
-		            y1 = startY;
-		            for (int i=0; i<=(yline); i++){
-		            	comp1.addLine(x1, y1, x1, y1+(50*xline), Color.LIGHT_GRAY);
-		            	x1 += (50);
-		            }
-		            isINIT = true;
 
-	        	}
-	        }
-	    });
-	    
 	    // Run
 	    RUNButton.addActionListener(new ActionListener() {
 	        @Override
@@ -359,14 +355,92 @@ public class GTS_RETELLIGENCE extends JComponent{
 	    });
 	    
 	    
-	    // C:\Users\iwins\Presets
-	    // Preset 1
 	    T1Button.addActionListener(new ActionListener() {
+	        @Override
+	        public void actionPerformed(ActionEvent e) {
+	        	int isNODEin = 0;
+	            byte[] b = new byte[1024];
+	            String Xinfo;
+	            String Yinfo;
+	            String Tinfo;
+	            String Pinfo;
+	            
+	            // Erase previous % re-initialize
+	            comp1.clearLines();
+	            isINIT = false;
+	            initializeButton.doClick();
+	            NodeClear();
+	            
+	            
+	            // Node INIT
+	            try{
+	            	BufferedReader br = new BufferedReader(new FileReader("c:/Users/iwins/Presets/p1/Nodes.txt"));
+	                while(true) {
+	                    String line = br.readLine();
+	                    if (line==null) break;
+	                    
+	                    // get data
+	                    Xinfo = line.split(";")[0];
+	                    Yinfo = line.split(";")[1];
+	                    Tinfo = line.split(";")[2];
+	                    Pinfo = line.split(";")[3];
+	                    int inX = Integer.parseInt(Xinfo);
+	                    int inY = Integer.parseInt(Yinfo);
+	                    int ttype = Integer.parseInt(Tinfo);
+	                    int population = Integer.parseInt(Pinfo);
+	                    
+	                    // create node
+	                    Color color;
+						switch(ttype){
+						case 1 : color = Color.blue; break;
+						case 2 : color = Color.magenta; break;
+						case 3 : color = Color.DARK_GRAY; break;
+						default : color = Color.DARK_GRAY; break;
+						}
+						newNode((inX*100+inY), population, ttype);
+			            int xline = 10, yline = 10;
+			            int startX = 45+(inX*50), startY=45+(inY*50);
+			            
+			            // Draw Horizontal lines
+			            int x1 = startX, y1 = startY;
+			            for (int i=0; i<=(xline); i++){
+			            	comp1.addLine(x1, y1, x1+(10), y1, color);
+			            	y1 += 1;
+			            }
+			            // Draw vertical lines
+			            x1 = startX;
+			            y1 = startY;
+			            for (int i=0; i<=(yline); i++){
+			            	comp1.addLine(x1, y1, x1, y1+(10), color);
+			            	x1 += 1;
+			            }	
+			            NodeCount += 1;
+			            //System.out.printf("New Node Created at %d, %d", inX, inY);
+	                }
+	                br.close();
+	                isNODEin = 1;
+	                System.out.println("<<Preset.1 all Nodes created>>");
+	                print();
+	            }
+	            catch (Exception e1) {
+	            	System.out.print("Error accoured while opening Node File : P1");
+	            }
+	            
+	            // Road INIT
+	            if (isNODEin==1){
+	            	
+	            }
+	        }
+
+	    });
+	    
+	    // Preset 2
+	    T2Button.addActionListener(new ActionListener() {
 	        @Override
 	        public void actionPerformed(ActionEvent e) {
 	            byte[] b = new byte[1024];
 	            try{
-		            FileInputStream input = new FileInputStream("C:/Users/iwins/Presets/p1/Nodes");
+		            FileInputStream input = new FileInputStream("c:/Users/iwins/Presets/p2/Nodes.txt");
 		            input.read(b);
 		            System.out.println(new String(b));
 		            input.close();
@@ -377,11 +451,28 @@ public class GTS_RETELLIGENCE extends JComponent{
 	        }
 	    });
 	    
+	    
+	    // Preset 3
+	    T3Button.addActionListener(new ActionListener() {
+	        @Override
+	        public void actionPerformed(ActionEvent e) {
+	            byte[] b = new byte[1024];
+	            try{
+		            FileInputStream input = new FileInputStream("c:/Users/iwins/Presets/p3/Nodes.txt");
+		            input.read(b);
+		            System.out.println(new String(b));
+		            input.close();
+	            }
+	            catch (Exception e1) {
+	            	System.out.print("¤Ð¤Ì");
+	            }
+	        }
+	    });
+	    
+	    
 
 	    testFrame.pack();
 	    testFrame.setVisible(true);
-	    testFrame2.pack();
-	    testFrame2.setVisible(true);
 
 		
 		// Run
