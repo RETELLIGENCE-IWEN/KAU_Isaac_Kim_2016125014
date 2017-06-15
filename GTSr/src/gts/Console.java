@@ -9,9 +9,10 @@ import javax.swing.JFrame;
 import javax.swing.JTextArea;
 
 public class Console {
+	  JTextArea textArea;
 	  final JFrame frame = new JFrame("System Log");
 	  public Console() {
-	    JTextArea textArea = new JTextArea(24, 80);
+	    textArea = new JTextArea(40, 80);
 	    textArea.setBackground(Color.BLACK);
 	    textArea.setForeground(Color.ORANGE);
 	    textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
@@ -29,5 +30,8 @@ public class Console {
 	  }
 	  public JFrame getFrame() {
 	    return frame;
+	  }
+	  public void out(String arg){
+		  System.out.println(arg);
 	  }
 }
