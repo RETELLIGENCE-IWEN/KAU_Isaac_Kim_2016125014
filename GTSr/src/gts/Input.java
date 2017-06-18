@@ -1,22 +1,24 @@
 package gts;
-import java.util.*;
-import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
 
 
-public class Test2 {
-	private int inX, inY, tp, pop;
-	private int SX, SY, DX, DY, TP;
+public class Input {
+	private int inX = 99, inY = 99, tp = 99, pop = 99;
+	private int SX = 99, SY = 99, DX = 99, DY = 99, TP = 99;
 	private boolean isINIT = false;
-	public int Nready=0, Rready=0;
+	private int x_limit, y_limit;
+
+	int[] RN, NN;
+
 	public void setINIT(boolean a){
 		isINIT = a;
 	}
 	
 	public int[] getNode(){
-		int[] NN = new int[4];
+		NN = new int[4];
 		NN[0] = inX;
 		NN[1] = inY;
 		NN[2] = tp;
@@ -25,22 +27,23 @@ public class Test2 {
 	}
 	
 	public int[] getRoad(){
-		int[] NN = new int[5];
-		NN[0] = SX;
-		NN[1] = SY;
-		NN[2] = DX;
-		NN[3] = DY;
-		NN[4] = TP;
-		return NN;
+		RN = new int[5];
+		RN[0] = SX;
+		RN[1] = SY;
+		RN[2] = DX;
+		RN[3] = DY;
+		RN[4] = TP;
+		return RN;
 	}
 	
-	public Test2(){
-		
+	public Input(int xl, int yl){
+		x_limit = xl;
+		y_limit = yl;
 	    JFrame frame = new JFrame("System Input");
 	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    frame.setPreferredSize(new Dimension(500, 500));
 	    frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
-	    frame.setLocation(1250, 0);
+	    frame.setLocation(30, 200);
 	    
         JTextField textfield = new JTextField("", 6);
         JTextField textfield2 = new JTextField("", 6);
@@ -52,59 +55,93 @@ public class Test2 {
         JTextField textfield23 = new JTextField("", 6);
         JTextField textfield13 = new JTextField("", 6);
         
+        
         JButton b1 = new JButton("New Node");
         b1.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
 				if (isINIT == true){
-				int inX, inY, tp, pop;
 				try{
 					inX = Integer.parseInt(textfield.getText());
 					inY = Integer.parseInt(textfield2.getText());
 					tp = Integer.parseInt(textfield12.getText());
 					pop = Integer.parseInt(textfield13.getText());
+					if(inX>x_limit || inX<0 || inY>y_limit || inY<0 ||tp>3 || tp<0 || pop<0){
+						inX = 99;
+						inY = 99;
+						tp = 99;
+						pop = 99;
+					}
 				}
 				catch (Exception e1) {
 					return;
 				}
-				System.out.printf("x: %d    y: %d    T: %d    pop: %d", inX, inY, tp, pop);
-				Nready = 1;
-				// make
 				textfield.setText("");
 				textfield2.setText("");
 				textfield12.setText("");
 				textfield13.setText("");
-				
 				}
 			}
 		});
        
         
-        
-        
-        
         JButton b2 = new JButton("New Road");
         b2.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.print("B2");
+				if (isINIT == true){
+					try{
+						SX = Integer.parseInt(textfield3.getText());
+						SY = Integer.parseInt(textfield4.getText());
+						DX = Integer.parseInt(textfield5.getText());
+						DY = Integer.parseInt(textfield6.getText());
+						TP = Integer.parseInt(textfield23.getText());
+						if(SX>x_limit || SX<0 || SY>y_limit || SY<0 ||DX>x_limit || DX<0 || DY>y_limit || DY<0 || TP>3 || TP<0){
+							SX = 99;
+							SY = 99;
+							DX = 99;
+							DY = 99;
+							TP = 99;
+						}
+					}
+					catch (Exception e1) {
+						return;
+					}
+					textfield3.setText("");
+					textfield4.setText("");
+					textfield5.setText("");
+					textfield6.setText("");
+					textfield23.setText("");
+					}
 			}
 		});
         
+        
         JPanel panel = new JPanel();
         JPanel panel2 = new JPanel();
+        JPanel paneli = new JPanel();
+
+        JLabel i = new JLabel("NOTICE : Enter infromation of new 'Node' or 'Road'");
+        JLabel i2 = new JLabel("and click the 'New Node' or 'New Road' button. ");
+        JLabel i3 = new JLabel("Then switch to the main window and press 'New Node'"); 
+        JLabel i4 = new JLabel( "or 'New Road' button on main window");
+        paneli.add(i);
+        paneli.add(i2);
+        paneli.add(i3);
+        paneli.add(i4);
         
-        JLabel n1 = new JLabel("Add New Node");
-        JLabel n2 = new JLabel("Add New Road");
-        //n1.setFont(font);
+        JLabel n1 = new JLabel("[ Add New Node ]");
+        JLabel n2 = new JLabel("[ Add New Road ]");
+        n1.setFont(new Font("Courier", Font.BOLD, 16));
+        n2.setFont(new Font("Courier", Font.BOLD, 16));
+        
 
         JLabel b11 = new JLabel("            "); 
         JLabel b22 = new JLabel("            ");
         JLabel b33 = new JLabel("            ");
         JLabel b44 = new JLabel("             ");
         JLabel b55 = new JLabel("            ");
-        JLabel b66 = new JLabel("            ");
         JLabel jl = new JLabel("X Coordinate");
         JLabel j2 = new JLabel("Y Coordinate");
         JLabel j3 = new JLabel("Start X");
@@ -142,14 +179,16 @@ public class Test2 {
         
         panel2.add(j23);
         panel2.add(textfield23);
-        
-        
         panel2.add(b2);
-
+        
+        panel.setSize(new Dimension(100, 100));
+        
+        
         frame.add(n1);
         frame.add(panel);
         frame.add(n2);
         frame.add(panel2);
+        frame.add(paneli);
         
         frame.pack();
         frame.setVisible(true);

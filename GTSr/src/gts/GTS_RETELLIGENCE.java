@@ -10,6 +10,7 @@ import javax.swing.*;
 
 public class GTS_RETELLIGENCE extends JComponent{
 
+	public static int GLOBAL_TIME;
 	private static final long serialVersionUID = -2451104197357070767L;
 	static Scanner scan = new Scanner(System.in);	
 	public static boolean isINIT = false;
@@ -19,7 +20,7 @@ public class GTS_RETELLIGENCE extends JComponent{
 	public static int Y_limit = 12;
 	
 	public static Node[] NodeTable = new Node[(X_limit*Y_limit)];
-	public static Node[] RoadTable = new Node[(X_limit*Y_limit*16)];
+	public static Road[] RoadTable = new Road[(X_limit*Y_limit*16)];
 	
 	private static class Line{
 	    final int x1; 
@@ -65,6 +66,9 @@ public class GTS_RETELLIGENCE extends JComponent{
 
 	
 	static void newNode(int id, int population, int t){
+		if(getNode(id)!=null){
+			return;
+		}
 		if (NodeCount < X_limit*Y_limit){
 			if(t==3){
 				Node temp = new Node(id, t);
@@ -85,31 +89,50 @@ public class GTS_RETELLIGENCE extends JComponent{
 			// no more space
 		}
 	}
-	
-	@SuppressWarnings("unused")
-	static void delNode(int id){
-		for (int i = 0; i<NodeTable.length; i++){
-			if ((NodeTable[i].getPositionID())==id){
-				int k = i;
-				for(int j=k+1; j<NodeTable.length; j++){
-					if(NodeTable[j]!=null){
-						NodeTable[k]=NodeTable[j];
-					}
-					k+=1;
-					break;
-				}
-			}
-			NodeCount -= 1;
-		}
-	}
-	
+
 	static void NodeClear() {
 		NodeCount = 0;
+		RoadClear();
 		NodeTable = new Node[(X_limit*Y_limit)];
 		
 	}
 	
 	public static Node getNode(int id){
+		for (int i = 0; i<NodeCount; i++){
+			if ((NodeTable[i].getPositionID())==id){
+				return NodeTable[i];
+			}		
+		}
+		return null;
+	}
+	
+	
+	
+	static int newRoad(int sX, int sY, int dX, int dY, int type){
+		Node tp1 = getNode((sX*100)+sY);
+		Node tp2 = getNode((dX*100)+dY);
+		if (tp1!=null && tp2!=null){
+			Road temp = new Road(sX, sY, dX, dY, type, tp2);
+			RoadTable[RoadCount] = temp;
+			RoadCount += 1;
+			//tp1.Add_link_out(temp);
+			return 0;
+		}
+		else{
+			System.out.println("\nUnable to create Road with incomplete connection");
+			return 1;
+		}	
+	}
+	
+	static void RoadClear() {
+		RoadCount = 0;
+		RoadTable = new Road[(X_limit*Y_limit*16)];
+		for (int i = 0; i< NodeCount; i++){
+			NodeTable[i].ressetRoads();
+		}
+	}
+	
+	public static Node getRoad(int id){
 		Node temp = new Node();
 		for (int i = 0; i<NodeTable.length; i++){
 			if ((NodeTable[i].getPositionID())==id){
@@ -119,33 +142,9 @@ public class GTS_RETELLIGENCE extends JComponent{
 		}
 		return null;
 	}
-	
-	
-	
-	static void newRoad(int sX, int sY, int dX, int dY, int type){
-		int stat=0;
 
-        //System.out.printf("\nNew Road Created form %d, %d   to %,d %d", sX, sY, dX, dY);
-		/*
-		for (int i = 0; i<NodeTable.length; i++){
-			if ((NodeTable[i].getPositionID())==start){
-				for (int j = 0; j<NodeTable.length; j++){
-					if ((NodeTable[j].getPositionID())==end){
-						NodeTable[i].Add_link_out(NodeTable[j]);
-						NodeTable[j].Add_link_in(NodeTable[i]);
-						System.out.print("\nNew Road Created");
-						stat += 1 ;
-						break;
-					}
-				}
-			}
-			if (stat==1){
-				break;
-			}
-		}
-		*/
-	}
-
+	
+	
 	static void Run(){
 		int time;
 		System.out.print("Enter steps : ");
@@ -157,47 +156,47 @@ public class GTS_RETELLIGENCE extends JComponent{
 	}
 	
 	static void print(){
-		//System.out.print("\nprint");
-		for(int i = 0; i<NodeTable.length; i++){
+		// Printing Nodes
+		for(int i = 0; i<NodeCount; i++){
 			if(NodeTable[i]!=null){
-				System.out.printf("\nNode %d : %d, %d    Type : %s   Polulation : %d", i/2, 
+				System.out.printf("\nNode %d : %d, %d    Type : %s   Polulation : %d", i, 
 						(NodeTable[i].getPositionID())/100, (NodeTable[i].getPositionID())%100, 
 						NodeTable[i].getType(), NodeTable[i].getPopulation());
 			}
 		}
 		System.out.print("\n\n");
 		
+		// Printing Roads
+		for(int i = 0; i<RoadCount; i++){
+			if(RoadTable[i]!=null){
+				System.out.printf("\nRode %d : %d, %d -> %d, %d    Type : %s ", i,
+						RoadTable[i].getSX(), RoadTable[i].getSY(), RoadTable[i].getDX(), RoadTable[i].getDY(), RoadTable[i].getType());
+			}
+		}
+		System.out.print("\n\n");
 	}
 	
 
 	
 	
-	
-	
-	
+
 	public static void main(String[] args) throws IOException{
-
-
-		//System.out.print((NodeTable(1).getPositionID()));
 
 		// initialize
 		
 		// initialize grid
 	
 		// initialize nodes
-		Test2 tt = new Test2();
+		
 		
 		// GUI Frame
 	    JFrame testFrame = new JFrame("Ground Transportation Simulation - RETELLIGENCE");
-	    testFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	    testFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    final GTS_RETELLIGENCE comp1 = new GTS_RETELLIGENCE();
 	    comp1.setPreferredSize(new Dimension(700, 800));
 	    testFrame.getContentPane().add(comp1, BorderLayout.CENTER);
 	    testFrame.setLocation(500, 0);
 	    
-
-
-	    JTextArea TA = new JTextArea();
 	    JPanel buttonsPanel = new JPanel();
 	    JPanel inputPanel = new JPanel();
 	    JButton initializeButton = new JButton("Initialize");
@@ -208,26 +207,20 @@ public class GTS_RETELLIGENCE extends JComponent{
 	    JButton T1Button = new JButton("Preset 1");
 	    JButton T2Button = new JButton("Preset 2");
 	    JButton T3Button = new JButton("Preset 3");
+	    JButton SaveButton = new JButton("Save");
+	    //JLabel name = new JLabel("Ground Transformation Simulation");
 	    
-
 	    //buttonsPanel.add(initializeButton);
 	    buttonsPanel.add(T1Button);
 	    buttonsPanel.add(T2Button);
-	    buttonsPanel.add(T3Button);
+	    //buttonsPanel.add(T3Button);
 	    buttonsPanel.add(newNodeButton);
 	    buttonsPanel.add(newLineButton);
 	    buttonsPanel.add(RUNButton);
 	    buttonsPanel.add(clearButton);
-	    //buttonsPanel.add(clearButton);
-	    //testFrame2.getContentPane().add(buttonsPanel2, BorderLayout.SOUTH);
+	    buttonsPanel.add(SaveButton);
 	    testFrame.getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
 	    testFrame.getContentPane().add(inputPanel, BorderLayout.NORTH);
-	    TA.setBounds(10, 10, 1000, 1000);
-	    //testFrame2.add(TA);
-	    
-	    
-	    
-	    
 	    Console console = new Console();
 	    console.init();
 
@@ -255,12 +248,14 @@ public class GTS_RETELLIGENCE extends JComponent{
 		            	x1 += (50);
 		            }
 		            isINIT = true;
-		            tt.setINIT(true);
 	        	}
 	        }
 	    });
 	    initializeButton.doClick();
-
+		Input tt = new Input(X_limit, Y_limit);
+		System.out.print("Initialization Complete");
+	    tt.setINIT(true);
+	    																									
     	
 	    // New Road
 	    newLineButton.addActionListener(new ActionListener() {
@@ -270,21 +265,27 @@ public class GTS_RETELLIGENCE extends JComponent{
 					int sX, sY, dX, dY;
 					int ttype;
 					Color color;
-					System.out.print("\n\n$ Node 0, 0 starts from top-left");
-					System.out.print("\nEnter X, Y Coordinate of start Node : ");
-					sX = scan.nextInt();
-					sY = scan.nextInt();
-					System.out.print("\nEnter X, Y Coordinate of destination Node : ");
-					dX = scan.nextInt();
-					dY = scan.nextInt();
+		
+					int[] input = new int[5];
+					input = tt.getRoad();
+					sX = input[0];
+					sY = input[1];
+					dX = input[2];
+					dY = input[3];
+					ttype = input[4];
+					if(sX==99){
+						return;
+					}
+	
 					if(sX <= X_limit || sY <= Y_limit || dX <= X_limit || dY <= Y_limit){
 						if(sX != dX && sY != dY){
 							return;
 						}
-						System.out.print("$ Road type  [1 : Normal]  [2 : Overpass] [3 : Underground Driveway]");
-						System.out.print("\nEnter type of new Road : ");
+						if (newRoad(sX, sY, dX, dY, ttype)!=0){
+							return;
+						}
 						
-						switch(ttype = scan.nextInt()){
+						switch(ttype){
 						case 1 : color = Color.BLACK; break;
 						case 2 : color = Color.CYAN;						
 						case 3 : color = Color.ORANGE; break;
@@ -295,7 +296,7 @@ public class GTS_RETELLIGENCE extends JComponent{
 								comp1.addLine(50+sX*50-3, 50+sY*50+5, 50+dX*50-3, 50+dY*50-5, color);
 							}
 							else{ // Bottom -> Up
-								comp1.addLine(50+sX*50+3, 50+sY*50+5, 50+dX*50+3, 50+dY*50-5, color);
+								comp1.addLine(50+sX*50+3, 50+sY*50-5, 50+dX*50+3, 50+dY*50+5, color);
 							}
 						}
 						else{ // Horizontal Road
@@ -303,13 +304,11 @@ public class GTS_RETELLIGENCE extends JComponent{
 								comp1.addLine(50+sX*50+5, 50+sY*50+3, 50+dX*50-5, 50+dY*50+3, color);
 							}
 							else{ // Right -> Left
-								comp1.addLine(50+sX*50+5, 50+sY*50-3, 50+dX*50-5, 50+dY*50-3, color);
+								comp1.addLine(50+sX*50-5, 50+sY*50-3, 50+dX*50+5, 50+dY*50-3, color);
 							}
 						
 						}
-						newRoad(sX, sY, dX, dY, ttype);
-			            RoadCount += 1;
-			            System.out.printf("\nNew Road Created form %d, %d   to %,d %d", sX, sY, dX, dY);
+			            System.out.printf("\nNew Road Created form %d, %d   to %,d %d   TYPE : %d", sX, sY, dX, dY, ttype);
 					}
 				}
 	        }
@@ -330,26 +329,25 @@ public class GTS_RETELLIGENCE extends JComponent{
 			public void actionPerformed(ActionEvent e) {
 				if (isINIT == true){
 					int inX, inY;
-					int ttype;
+					int ttype=3;
 					Color color;
 					int population = 0;
-					System.out.print("\n\n$ Node 0, 0 starts from top-left");
-					System.out.print("\nEnter X, Y Coordinate of new Node : ");
-					inX = scan.nextInt();
-					inY = scan.nextInt();
+	
+					inX = (tt.getNode())[0];
+					inY = (tt.getNode())[1];
+					ttype = (tt.getNode())[2];
+					population = (tt.getNode())[3];
+					if(inX==99){
+						return;
+					}
+		
 					if(inX <= X_limit || inY <= Y_limit){
-						System.out.print("$ Node type  [1 : Commercial district]  [2 : Residential district] [3 : Intersection]");
-						System.out.print("\nEnter type of new Node : ");
 						
-						switch(ttype = scan.nextInt()){
+						switch(ttype){
 						
-						case 1 : color = Color.blue; 
-						System.out.print("Enter Population : ");
-						population = scan.nextInt(); break;
+						case 1 : color = Color.blue;  break;
 						
-						case 2 : color = Color.magenta; 
-						System.out.print("Enter Population : ");
-						population = scan.nextInt(); break;
+						case 2 : color = Color.magenta; break;
 						
 						case 3 : color = Color.DARK_GRAY; break;
 						
@@ -372,7 +370,6 @@ public class GTS_RETELLIGENCE extends JComponent{
 			            	comp1.addLine(x1, y1, x1, y1+(10), color);
 			            	x1 += 1;
 			            }	
-			            NodeCount += 1;
 			            System.out.printf("New Node Created at %d, %d", inX, inY);
 			            print();
 					}
@@ -387,11 +384,11 @@ public class GTS_RETELLIGENCE extends JComponent{
 	        public void actionPerformed(ActionEvent e) {
 	        		// 24시간 모니터륑
 	        		// do something
-	        	
 	        }
 	    });
 	    
 	    
+	    // Preset 1
 	    T1Button.addActionListener(new ActionListener() {
 	        @Override
 	        public void actionPerformed(ActionEvent e) {
@@ -408,6 +405,259 @@ public class GTS_RETELLIGENCE extends JComponent{
 	            // Node INIT
 	            try{
 	            	BufferedReader br = new BufferedReader(new FileReader("c:/Users/iwins/Presets/p1/Nodes.txt"));
+	                while(true) {
+	                    String line = br.readLine();
+	                    if (line==null) break;
+	                    
+	                    // get data
+	                    Xinfo = line.split(";")[0];
+	                    Yinfo = line.split(";")[1];
+	                    Tinfo = line.split(";")[2];
+	                    Pinfo = line.split(";")[3];
+	                    int inX = Integer.parseInt(Xinfo);
+	                    int inY = Integer.parseInt(Yinfo);
+	                    int ttype = Integer.parseInt(Tinfo);
+	                    int population = Integer.parseInt(Pinfo);
+	                    
+	                    // create node
+	                    Color color;
+						switch(ttype){
+						case 1 : color = Color.blue; break;
+						case 2 : color = Color.magenta; break;
+						case 3 : color = Color.DARK_GRAY; break;
+						default : color = Color.DARK_GRAY; break;
+						}
+						newNode((inX*100+inY), population, ttype);
+
+
+			            int xline = 10, yline = 10;
+			            int startX = 45+(inX*50), startY=45+(inY*50);
+			            // Draw Horizontal lines
+			            int x1 = startX, y1 = startY;
+			            for (int i=0; i<=(xline); i++){
+			            	comp1.addLine(x1, y1, x1+(10), y1, color);
+			            	y1 += 1;
+			            }
+			            // Draw vertical lines
+			            x1 = startX;
+			            y1 = startY;
+			            for (int i=0; i<=(yline); i++){
+			            	comp1.addLine(x1, y1, x1, y1+(10), color);
+			            	x1 += 1;
+			            }	
+	                }
+	                br.close();
+	                isNODEin = 1;
+	                console.out("\n<<Preset.1 all Nodes created>>");
+	                //print();
+	            }
+	            catch (Exception e1) {
+	            	System.out.print(e1);
+	            	System.out.println("Error accoured while opening Node File : P1");
+	            }
+	            
+	            // Road INIT
+	            if (isNODEin==1){
+		            try{
+		            	BufferedReader br = new BufferedReader(new FileReader("c:/Users/iwins/Presets/p1/Roads.txt"));
+		                while(true) {
+		                    String line = br.readLine();
+		                    if (line==null) break;
+		                    
+		                    // get data
+		                    SX = line.split(";")[0];
+		                    SY = line.split(";")[1];
+		                    DX = line.split(";")[2];
+		                    DY = line.split(";")[3];
+		                    Tinfo = line.split(";")[4];
+		                    int sX = Integer.parseInt(SX);
+		                    int sY = Integer.parseInt(SY);
+		                    int dX = Integer.parseInt(DX);
+		                    int dY = Integer.parseInt(DY);
+		                    int ttype = Integer.parseInt(Tinfo);
+
+		                    // create node
+		                    Color color;
+							switch(ttype){
+							case 1 : color = Color.BLACK; break;
+							case 2 : color = Color.CYAN; break;
+							case 3 : color = Color.ORANGE; break;
+							default : color = Color.BLACK; break;
+							}
+							newRoad(sX, sY, dX, dY, ttype);
+							if (sX == dX){ // Vertical Road
+								if (sY < dY){ // Top -> Down
+									comp1.addLine(50+sX*50-3, 50+sY*50+5, 50+dX*50-3, 50+dY*50-5, color);
+								}
+								else{ // Bottom -> Up
+									comp1.addLine(50+sX*50+3, 50+sY*50-5, 50+dX*50+3, 50+dY*50+5, color);
+								}
+							}
+							else{ // Horizontal Road
+								if (sX < dX){ // Left -> Right
+									comp1.addLine(50+sX*50+5, 50+sY*50+3, 50+dX*50-5, 50+dY*50+3, color);
+								}
+								else{ // Right -> Left
+									comp1.addLine(50+sX*50-5, 50+sY*50-3, 50+dX*50+5, 50+dY*50-3, color);
+								}
+							
+							}
+		                }
+		                br.close();
+		                System.out.print("<<Preset.1 all Roads created>>");
+		            }
+		            catch (Exception e1) {
+		            	System.out.print("Error accoured while opening Road File : P1");
+		            }
+	            }
+                print();
+	        }
+	    });
+	    
+	    // Preset 2
+	    T2Button.addActionListener(new ActionListener() {
+	        @Override
+	        public void actionPerformed(ActionEvent e) {
+	        	int isNODEin = 0;
+	            String Xinfo, Yinfo, Tinfo, Pinfo;
+	            String SX, SY, DX, DY;
+	            // Erase previous % re-initialize
+	            comp1.clearLines();
+	            isINIT = false;
+	            initializeButton.doClick();
+	            NodeClear();
+	            
+	            
+	            // Node INIT
+	            try{
+	            	BufferedReader br = new BufferedReader(new FileReader("c:/Users/iwins/Presets/p2/Nodes.txt"));
+	                while(true) {
+	                    String line = br.readLine();
+	                    if (line==null) break;
+	                    
+	                    // get data
+	                    Xinfo = line.split(";")[0];
+	                    Yinfo = line.split(";")[1];
+	                    Tinfo = line.split(";")[2];
+	                    Pinfo = line.split(";")[3];
+	                    int inX = Integer.parseInt(Xinfo);
+	                    int inY = Integer.parseInt(Yinfo);
+	                    int ttype = Integer.parseInt(Tinfo);
+	                    int population = Integer.parseInt(Pinfo);
+	                    
+	                    // create node
+	                    Color color;
+						switch(ttype){
+						case 1 : color = Color.blue; break;
+						case 2 : color = Color.magenta; break;
+						case 3 : color = Color.DARK_GRAY; break;
+						default : color = Color.DARK_GRAY; break;
+						}
+						newNode((inX*100+inY), population, ttype);
+
+
+			            int xline = 10, yline = 10;
+			            int startX = 45+(inX*50), startY=45+(inY*50);
+			            // Draw Horizontal lines
+			            int x1 = startX, y1 = startY;
+			            for (int i=0; i<=(xline); i++){
+			            	comp1.addLine(x1, y1, x1+(10), y1, color);
+			            	y1 += 1;
+			            }
+			            // Draw vertical lines
+			            x1 = startX;
+			            y1 = startY;
+			            for (int i=0; i<=(yline); i++){
+			            	comp1.addLine(x1, y1, x1, y1+(10), color);
+			            	x1 += 1;
+			            }	
+	                }
+	                br.close();
+	                isNODEin = 1;
+	                console.out("\n<<Preset.2 all Nodes created>>");
+	                //print();
+	            }
+	            catch (Exception e1) {
+	            	System.out.print(e1);
+	            	System.out.println("Error accoured while opening Node File : P2");
+	            }
+	            
+	            // Road INIT
+	            if (isNODEin==1){
+		            try{
+		            	BufferedReader br = new BufferedReader(new FileReader("c:/Users/iwins/Presets/p2/Roads.txt"));
+		                while(true) {
+		                    String line = br.readLine();
+		                    if (line==null) break;
+		                    
+		                    // get data
+		                    SX = line.split(";")[0];
+		                    SY = line.split(";")[1];
+		                    DX = line.split(";")[2];
+		                    DY = line.split(";")[3];
+		                    Tinfo = line.split(";")[4];
+		                    int sX = Integer.parseInt(SX);
+		                    int sY = Integer.parseInt(SY);
+		                    int dX = Integer.parseInt(DX);
+		                    int dY = Integer.parseInt(DY);
+		                    int ttype = Integer.parseInt(Tinfo);
+
+		                    // create node
+		                    Color color;
+							switch(ttype){
+							case 1 : color = Color.BLACK; break;
+							case 2 : color = Color.CYAN; break;
+							case 3 : color = Color.ORANGE; break;
+							default : color = Color.BLACK; break;
+							}
+							newRoad(sX, sY, dX, dY, ttype);
+							if (sX == dX){ // Vertical Road
+								if (sY < dY){ // Top -> Down
+									comp1.addLine(50+sX*50-3, 50+sY*50+5, 50+dX*50-3, 50+dY*50-5, color);
+								}
+								else{ // Bottom -> Up
+									comp1.addLine(50+sX*50+3, 50+sY*50-5, 50+dX*50+3, 50+dY*50+5, color);
+								}
+							}
+							else{ // Horizontal Road
+								if (sX < dX){ // Left -> Right
+									comp1.addLine(50+sX*50+5, 50+sY*50+3, 50+dX*50-5, 50+dY*50+3, color);
+								}
+								else{ // Right -> Left
+									comp1.addLine(50+sX*50-5, 50+sY*50-3, 50+dX*50+5, 50+dY*50-3, color);
+								}
+							
+							}
+		                }
+		                br.close();
+		                System.out.print("<<Preset.2 all Roads created>>");
+		            }
+		            catch (Exception e1) {
+		            	System.out.print("Error accoured while opening Road File : P2");
+		            }
+	            }
+	        }
+	    });
+
+	    
+	    // Preset 3
+	    T3Button.addActionListener(new ActionListener() {
+	        @Override
+	        public void actionPerformed(ActionEvent e) {
+	        	int isNODEin = 0;
+	            String Xinfo, Yinfo, Tinfo, Pinfo;
+	            String SX, SY, DX, DY;
+	            // Erase previous % re-initialize
+	            comp1.clearLines();
+	            isINIT = false;
+	            initializeButton.doClick();
+	            NodeClear();
+	            RoadClear();
+	            
+	            
+	            // Node INIT
+	            try{
+	            	BufferedReader br = new BufferedReader(new FileReader("c:/Users/iwins/Presets/p3/Nodes.txt"));
 	                while(true) {
 	                    String line = br.readLine();
 	                    if (line==null) break;
@@ -451,17 +701,17 @@ public class GTS_RETELLIGENCE extends JComponent{
 	                }
 	                br.close();
 	                isNODEin = 1;
-	                console.out("\n<<Preset.1 all Nodes created>>");
+	                console.out("\n<<Preset.3 all Nodes created>>");
 	                //print();
 	            }
 	            catch (Exception e1) {
-	            	System.out.print("Error accoured while opening Node File : P1");
+	            	System.out.print("Error accoured while opening Node File : P3");
 	            }
 	            
 	            // Road INIT
 	            if (isNODEin==1){
 		            try{
-		            	BufferedReader br = new BufferedReader(new FileReader("c:/Users/iwins/Presets/p1/Roads.txt"));
+		            	BufferedReader br = new BufferedReader(new FileReader("c:/Users/iwins/Presets/p3/Roads.txt"));
 		                while(true) {
 		                    String line = br.readLine();
 		                    if (line==null) break;
@@ -508,49 +758,14 @@ public class GTS_RETELLIGENCE extends JComponent{
 				            RoadCount += 1;
 		                }
 		                br.close();
-		                System.out.println("<<Preset.1 all Roads created>>");
+		                System.out.print("<<Preset.3 all Roads created>>");
 		            }
 		            catch (Exception e1) {
-		            	System.out.print("Error accoured while opening Node File : P1");
+		            	System.out.print("Error accoured while opening Node File : P3");
 		            }
 	            }
 	        }
 
-	    });
-	    
-	    // Preset 2
-	    T2Button.addActionListener(new ActionListener() {
-	        @Override
-	        public void actionPerformed(ActionEvent e) {
-	            byte[] b = new byte[1024];
-	            try{
-		            FileInputStream input = new FileInputStream("c:/Users/iwins/Presets/p2/Nodes.txt");
-		            input.read(b);
-		            System.out.println(new String(b));
-		            input.close();
-	            }
-	            catch (Exception e1) {
-	            	System.out.print("ㅠㅜ");
-	            }
-	        }
-	    });
-	    
-	    
-	    // Preset 3
-	    T3Button.addActionListener(new ActionListener() {
-	        @Override
-	        public void actionPerformed(ActionEvent e) {
-	            byte[] b = new byte[1024];
-	            try{
-		            FileInputStream input = new FileInputStream("c:/Users/iwins/Presets/p3/Nodes.txt");
-		            input.read(b);
-		            System.out.println(new String(b));
-		            input.close();
-	            }
-	            catch (Exception e1) {
-	            	System.out.print("ㅠㅜ");
-	            }
-	        }
 	    });
 	    
 	    

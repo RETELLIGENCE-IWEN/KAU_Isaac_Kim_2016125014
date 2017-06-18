@@ -2,11 +2,13 @@ package gts;
 
 public class Node {
 
+
 	private int positionID;
-	protected Node[] outLinks;
-	protected Node[] inLinks;
+	protected Road[] outLinks;
+	protected Road[] inLinks;
 	protected int population = 0;
 	private String type;
+	private int outLinkCount, inLinkCount;
 	
 	// Constructor (NormalArea)
 	public Node(int pos, int pop, int t){
@@ -21,8 +23,6 @@ public class Node {
 		else if (t==3){
 			type = "Intersection";
 		}
-		outLinks = new Node[1];
-		inLinks = new Node[1];
 	}
 	
 	// Constructor Abstract (Intersection)
@@ -42,30 +42,35 @@ public class Node {
 	
 	
 	// Add out Link
-	public void Add_link_out(Node target){
+	public void Add_link_out(Road target){
 		
 		// totally isolated before
-		if (outLinks==null){
-			Node[] outlinks = new Node[1];
-			outlinks[0] = target;
+		if (outLinkCount==0){
+			outLinks = new Road[1];
+			outLinks[0] = target;
+			outLinkCount += 1;
 		}
 		else{
-			Node[] temp = new Node[1 + (outLinks.length)];
+			Road[] temp = new Road[1 + (outLinkCount)];
+			for (int i = 0; i<outLinkCount; i++){
+				temp[i] = outLinks[i];
+			}
 			temp[-1] = target;
 			outLinks = temp;
+			outLinkCount += 1;
 		}
 	}
 	
 	// Add in Link
-	public void Add_link_in(Node target){
+	public void Add_link_in(Road target){
 		
 		// totally isolated before
 		if (inLinks==null){
-			Node[] inlinks = new Node[1];
-			inlinks[0] = target;
+			inLinks = new Road[1];
+			inLinks[0] = target;
 		}
 		else{
-			Node[] temp = new Node[1 + (inLinks.length)];
+			Road[] temp = new Road[1 + (inLinks.length)];
 			temp[-1] = target;
 			inLinks = temp;
 		}
@@ -96,6 +101,11 @@ public class Node {
 
 	public void test() {
 		System.out.print("Hello Sungsoo");
+	}
+
+	public void ressetRoads() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
